@@ -1,4 +1,4 @@
-Corb Scripts for Forest Rebalancing
+CoRB Scripts for Forest Rebalancing
 ===
 
 Sometimes a MarkLogic Server database will have several forests.
@@ -24,21 +24,21 @@ Setup
 
 This project contains a shell script and a pair of XQuery modules,
 intended for use with [CoRB](http://marklogic.github.com/corb/).
-Corb requires a configured XDBC server,
+CoRB requires a configured XDBC server,
 and the root of that XCC server must contain the corb-rebalancer modules:
 
     uris.xqy
     rebalance.xqy
 
-If Corb crashes with `SVC-FILOPN` then the root is likely to be the problem.
+If CoRB crashes with `SVC-FILOPN` then the root is likely to be the problem.
 Check your settings carefully.
 
-When run, `crb.sh` will download jar files for Corb and XCC.
+When run, `crb.sh` will download jar files for CoRB and XCC.
 If you are not connected to the Internet, then you must place both jar files
 in the corb-rebalance directory.
 
-    [corb.jar](http://marklogic.github.com/corb/corb.jar)
-    [marklogic-xcc-5.0.1.jar](http://developer.marklogic.com/products/xcc/5.0)
+* [corb.jar](http://marklogic.github.com/corb/corb.jar)
+* [marklogic-xcc-5.0.1.jar](http://developer.marklogic.com/products/xcc/5.0)
 
 The MarkLogic XCC client API is generally backward-compatible,
 so this jar file should also work with earlier versions of the server.
@@ -71,7 +71,7 @@ Make sure they are in the root directory as specified for the XDBC server,
 and that the modules database is set to `(filesystem)`.
 Make sure that the MarkLogic Server process can read the files.
 
-The error CRB-EMPTYSOURCES means that the forests are already well-balanced.
+The error `CRB-EMPTYSOURCES` means that the forests are already well-balanced.
 Note that these scripts only look at document counts, not fragment counts.
 That is because sub-fragments of a document must all live in the same forest.
 Also, this tool does not balance on-disk size.
