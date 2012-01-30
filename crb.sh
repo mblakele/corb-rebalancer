@@ -47,7 +47,9 @@ fi
 VMARGS=$*
 
 # look for GNU readlink first (OS X, BSD, Solaris)
+set +e
 READLINK=`type -P greadlink`
+set -e
 if [ -z "$READLINK" ]; then
     # if readlink is not GNU-style, setting BASE will fail
     READLINK=`type -P readlink`
