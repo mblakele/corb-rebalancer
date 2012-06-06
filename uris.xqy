@@ -1,7 +1,7 @@
 xquery version "1.0-ml";
 
 (:
- : Copyright (c) 2011 Michael Blakeley. All Rights Reserved.
+ : Copyright (c) 2011-2012 Michael Blakeley. All Rights Reserved.
  :
  : Licensed under the Apache License, Version 2.0 (the "License");
  : you may not use this file except in compliance with the License.
@@ -20,16 +20,16 @@ xquery version "1.0-ml";
  :
  :)
 
-declare namespace fs="http://marklogic.com/xdmp/status/forest";
+declare namespace fs="http://marklogic.com/xdmp/status/forest" ;
 
 (: forests will be balanced within 3% :)
-declare variable $TOLERANCE := xs:double(0.03);
+declare variable $TOLERANCE := xs:double(0.03) ;
 
 (: This code is designed to minimize FLWOR expressions,
  : and maximize streaming.
  :)
 declare variable $DATABASE-FORESTS := xdmp:database-forests(
-  xdmp:database(), false());
+  xdmp:database(), false()) ;
 
 (: NB - pointless to count fragments,
  : because all fragments for a given document
@@ -43,24 +43,14 @@ declare variable $COUNTS-MAP := (
       $m,
       string($f),
       sum(xdmp:forest-counts($f, 'document-count')/fs:document-count)))
-  return $m
-);
+  return $m) ;
 
-declare variable $COUNTS-MAP-AVG := avg(
-  map:get($COUNTS-MAP, map:keys($COUNTS-MAP)));
+declare variable $COUNTS-MAP-AVG as xs:double := avg(
+  map:get($COUNTS-MAP, map:keys($COUNTS-MAP))) ;
 
 declare variable $COUNTS-MAX := (1.0 + $TOLERANCE) * $COUNTS-MAP-AVG ;
 
 declare variable $COUNTS-MIN := (1.0 - $TOLERANCE) * $COUNTS-MAP-AVG ;
-
-(: Calculate number of documents to move, based on document count :)
-declare variable $LIMIT-COUNT as xs:integer := (
-  (: best to truncate, not round - default to not moving anything :)
-  xs:integer(
-    sum(
-      for $f in $SOURCE-FOREST-IDS
-      return map:get($COUNTS-MAP, string($f)) - $COUNTS-MAP-AVG))
-);
 
 declare variable $SOURCE-FOREST-IDS as xs:unsignedLong* := (
   let $d := xdmp:log(
@@ -74,8 +64,15 @@ declare variable $SOURCE-FOREST-IDS as xs:unsignedLong* := (
       text {
         'corb-rebalancer/uris.xqy: adding source forest',
         $f, xdmp:forest-name($id) },
-      'debug'))
-);
+      'debug'))) ;
+
+(: Calculate number of documents to move, based on document count :)
+declare variable $LIMIT-COUNT as xs:long := (
+  (: best to truncate, not round - default to not moving anything :)
+  xs:long(
+    sum(
+      for $f in $SOURCE-FOREST-IDS
+      return map:get($COUNTS-MAP, string($f)) - $COUNTS-MAP-AVG))) ;
 
 declare variable $TARGET-FOREST-IDS as xs:unsignedLong* := (
   let $d := xdmp:log(
@@ -89,8 +86,7 @@ declare variable $TARGET-FOREST-IDS as xs:unsignedLong* := (
       text {
         'corb-rebalancer/uris.xqy: adding target forest',
         $f, xdmp:forest-name($id) },
-      'debug'))
-);
+      'debug'))) ;
 
 (: This is a little sloppy. We could loop through the forests
  : and select the "right" number of uris for each,
